@@ -3,9 +3,11 @@ package main
 import "fmt"
 
 func main() {
-	var senderName = "Syl"
-	var recipient = "Kaladin"
-	var message = "The Words, Kaladin. You have to speak the Words!"
+	// initialize variables here
+	var smsSendingLimit int
+	var costPerSMS float64
+	var hasPermission int
+	var username string
 
-	fmt.Printf("%s to %s: %s\n", senderName, recipient, message)
+	fmt.Printf("%v %.2f %v %q\n", smsSendingLimit, costPerSMS, hasPermission, username)
 }
