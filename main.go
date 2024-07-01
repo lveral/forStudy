@@ -3,13 +3,9 @@ package main
 import "fmt"
 
 func main() {
-	var startup string = "Textio SMS service booting up..."
-	var message string = "Sending test message"
-	var confirmation string = "Message sent!"
+	var senderName = "Syl"
+	var recipient = "Kaladin"
+	var message = "The Words, Kaladin. You have to speak the Words!"
 
-	// don't touch below this line
-
-	fmt.Println(startup)
-	fmt.Println(message)
-	fmt.Println(confirmation)
+	fmt.Printf("%s to %s: %s\n", senderName, recipient, message)
 }
