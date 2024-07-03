@@ -5,25 +5,39 @@ import (
 	"testing"
 )
 
-type messageToSend struct {
-	message   string
-	sender    user
-	recipient user
+type membershipType string
+
+const (
+	TypeStandard membershipType = "standard"
+	TypePremium  membershipType = "premium"
+)
+
+// don't touch above this line
+
+type Membership struct {
+	Type             membershipType
+	MessageCharLimit int
 }
 
-type user struct {
-	name   string
-	number int
+type User struct {
+	Name string
+	Membership
 }
 
-func canSendMessage(mToSend messageToSend) bool {
-	if mToSend.sender.name == "" ||
-		mToSend.sender.number == 0 ||
-		mToSend.recipient.name == "" ||
-		mToSend.recipient.number == 0 {
-		return false
+func newUser(name string, membershipType membershipType) User {
+	var limit int
+	if membershipType == TypeStandard {
+		limit = 100
+	} else {
+		limit = 1000
 	}
-	return true
+	return User{
+		Name: name,
+		Membership: Membership{
+			Type:             membershipType,
+			MessageCharLimit: limit,
+		},
+	}
 }
 
 func main() {
@@ -33,34 +47,29 @@ func main() {
 
 func Test(t *testing.T) {
 	type testCase struct {
-		mToSend  messageToSend
-		expected bool
+		name           string
+		membershipType membershipType
+		expected       User
 	}
 
 	tests := []testCase{
-		{messageToSend{"Thanks for signing up", user{"Name1", 148255510981}, user{"Name2", 148255510982}}, true},
-		{messageToSend{"Thanks for signing up", user{"", 148255510981}, user{"Name2", 148255510982}}, false},
-		{messageToSend{"Thanks for signing up", user{"Name1", 0}, user{"Name2", 148255510982}}, false},
-		{messageToSend{"Thanks for signing up", user{"Name1", 148255510981}, user{"", 148255510982}}, false},
-		{messageToSend{"Thanks for signing up", user{"Name1", 148255510981}, user{"Name2", 0}}, false},
-		{messageToSend{"Thanks for signing up", user{"", 0}, user{"", 0}}, false},
+		{"Name1", TypeStandard, User{Name: "Name1", Membership: Membership{TypeStandard, 100}}},
+		{"Name1", TypePremium, User{Name: "Name1", Membership: Membership{TypePremium, 1000}}},
 	}
 
 	for _, test := range tests {
-		if output := canSendMessage(test.mToSend); output != test.expected {
+		if output := newUser(test.name, test.membershipType); output != test.expected {
 			t.Errorf(
-				"Test Failed: (%v, %v, %v) -> expected: %v actual: %v",
-				test.mToSend.message,
-				test.mToSend.sender,
-				test.mToSend.recipient,
+				"Test Failed: (%v, %v) -> expected: %v actual: %v",
+				test.name,
+				test.membershipType,
 				test.expected,
 				output,
 			)
 		} else {
-			fmt.Printf("Test Passed: (%v, %v, %v) -> expected: %v actual: %v\n",
-				test.mToSend.message,
-				test.mToSend.sender,
-				test.mToSend.recipient,
+			fmt.Printf("Test Passed: (%v, %v) -> expected: %v actual: %v\n",
+				test.name,
+				test.membershipType,
 				test.expected,
 				output,
 			)
