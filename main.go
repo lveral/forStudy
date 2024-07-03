@@ -1,26 +1,64 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
+
+type messageToSend struct {
+	phoneNumber int
+	message     string
+}
+
+var withSubmit = true
 
 func main() {
-	fmt.Print("Test Passed: (2, 89, 102) -> expected: 26 actual: ")
-	fmt.Print(monthlyBillIncrease(2, 89, 102))
-	fmt.Print("\nTest Passed: (2, 98, 104) -> expected: 12 actual: ")
-	fmt.Print(monthlyBillIncrease(2, 98, 104))
-	fmt.Print("\nTest Passed: (3, 50, 40) -> expected: -30 actual: ")
-	fmt.Print(monthlyBillIncrease(3, 50, 40))
-	fmt.Print("\nTest Passed: (3, 60, 60) -> expected: 0 actual: ")
-	fmt.Print(monthlyBillIncrease(3, 60, 60))
+	var t *testing.T
+	Test(t)
 }
 
-func monthlyBillIncrease(costPerSend, numLastMonth, numThisMonth int) int {
-	var lastMonthBill int
-	var thisMonthBill int
-	lastMonthBill = getBillForMonth(costPerSend, numLastMonth)
-	thisMonthBill = getBillForMonth(costPerSend, numThisMonth)
-	return thisMonthBill - lastMonthBill
+func getMessageText(m messageToSend) string {
+	return fmt.Sprintf("Sending message: '%s' to: %v\n", m.message, m.phoneNumber)
 }
 
-func getBillForMonth(costPerSend, messagesSent int) int {
-	return costPerSend * messagesSent
+func Test(t *testing.T) {
+	type testCase struct {
+		phoneNumber int
+		message     string
+		expected    string
+	}
+	tests := []testCase{
+		{148255510981, "Thanks for signing up", "Sending message: 'Thanks for signing up' to: 148255510981\n"},
+		{148255510982, "Love to have you aboard!", "Sending message: 'Love to have you aboard!' to: 148255510982\n"},
+	}
+	if withSubmit {
+		tests = append(tests, []testCase{
+			{148255510983, "We're so excited to have you", "Sending message: 'We're so excited to have you' to: 148255510983\n"},
+			{148255510984, "", "Sending message: '' to: 148255510984\n"},
+			{148255510985, "Hello, World!", "Sending message: 'Hello, World!' to: 148255510985\n"},
+			{148255510986, "This is a test message", "Sending message: 'This is a test message' to: 148255510986\n"},
+		}...)
+	}
+
+	for _, test := range tests {
+		if output := getMessageText(messageToSend{
+			phoneNumber: test.phoneNumber,
+			message:     test.message,
+		}); output != test.expected {
+			t.Errorf(
+				"Test Failed: (%v, %v) -> expected: %v actual: %v",
+				test.phoneNumber,
+				test.message,
+				test.expected,
+				output,
+			)
+		} else {
+			fmt.Printf("Test Passed: (%v, %v) -> expected: %v actual: %v\n",
+				test.phoneNumber,
+				test.message,
+				test.expected,
+				output,
+			)
+		}
+	}
 }
