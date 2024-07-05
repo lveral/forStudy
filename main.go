@@ -1,46 +1,50 @@
 package main
 
-import (
-	"fmt"
-)
-
-type PlainText struct {
-	message string
+type notification interface {
+	importance() int
 }
 
-func (p PlainText) Format() string {
-	return p.message
+type directMessage struct {
+	senderUsername string
+	messageContent string
+	priorityLevel  int
+	isUrgent       bool
 }
 
-type Bold struct {
-	message string
+func (d directMessage) importance() int {
+	if d.isUrgent {
+		return 50
+	}
+	return d.priorityLevel
 }
 
-func (b Bold) Format() string {
-	return fmt.Sprintf("**%s**", b.message)
+type groupMessage struct {
+	groupName      string
+	messageContent string
+	priorityLevel  int
 }
 
-type Code struct {
-	message string
+func (gm groupMessage) importance() int {
+	return gm.priorityLevel
 }
 
-func (c Code) Format() string {
-	return fmt.Sprintf("`%s`", c.message)
+type systemAlert struct {
+	alertCode      string
+	messageContent string
 }
 
-type Formatter interface {
-	Format() string
+func (sa systemAlert) importance() int {
+	return 100
 }
 
-func SendMessage(formatter Formatter) string {
-	return formatter.Format() // Adjusted to call Format without an argument
-}
-
-func main() {
-	pt := SendMessage(PlainText{"M1"})
-	fmt.Println(pt)
-	b := SendMessage(Bold{"M1"})
-	fmt.Println(b)
-	c := SendMessage(Code{"M1"})
-	fmt.Println(c)
+func processNotification(n notification) (string, int) {
+	switch v := n.(type) {
+	case directMessage:
+		return v.senderUsername, n.importance()
+	case groupMessage:
+		return v.groupName, n.importance()
+	case systemAlert:
+		return v.alertCode, n.importance()
+	}
+	return "", 0
 }
