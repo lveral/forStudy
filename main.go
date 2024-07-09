@@ -1,50 +1,39 @@
 package main
 
-type notification interface {
-	importance() int
+import (
+	"fmt"
+)
+
+type SomeInterface interface {
+	FirstFunc() string
+	//SecondFunc() string
 }
 
-type directMessage struct {
-	senderUsername string
-	messageContent string
-	priorityLevel  int
-	isUrgent       bool
+type divideError struct {
+	dividend float64
 }
 
-func (d directMessage) importance() int {
-	if d.isUrgent {
-		return 50
+func (d divideError) FirstFunc() string {
+	return fmt.Sprintf("FirstFunc %v", d.dividend)
+}
+
+func (d divideError) Error() string {
+	return fmt.Sprintf("can not divide %v by zero", d.dividend)
+}
+
+func (d divideError) SecondFunc() string {
+	return fmt.Sprintf("SecondFunc %v", d.dividend)
+}
+
+func divide(dividend, divisor float64) (float64, error) {
+	if divisor == 0 {
+		return 0, divideError{dividend: dividend}
 	}
-	return d.priorityLevel
+	return dividend / divisor, nil
 }
 
-type groupMessage struct {
-	groupName      string
-	messageContent string
-	priorityLevel  int
-}
-
-func (gm groupMessage) importance() int {
-	return gm.priorityLevel
-}
-
-type systemAlert struct {
-	alertCode      string
-	messageContent string
-}
-
-func (sa systemAlert) importance() int {
-	return 100
-}
-
-func processNotification(n notification) (string, int) {
-	switch v := n.(type) {
-	case directMessage:
-		return v.senderUsername, n.importance()
-	case groupMessage:
-		return v.groupName, n.importance()
-	case systemAlert:
-		return v.alertCode, n.importance()
-	}
-	return "", 0
+func main() {
+	a := 10.0
+	b := 0.0
+	fmt.Println(divide(a, b))
 }
