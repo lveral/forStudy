@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"errors"
 )
 
 type divideError struct {
@@ -18,9 +19,29 @@ func divide(dividend, divisor float64) (float64, error) {
 	}
 	return dividend / divisor, nil
 }
+	
+
+func validateStatus(status string) error {
+	if status == "" {
+		return errors.New("status cannot be empty")
+	}
+	if len(status) > 140 {
+		return errors.New("status exceeds 140 characters")
+	}
+	return nil
+}
 
 func main() {
-	a := 10.0
+	tests := []string{
+		"",
+		"normal status",
+		"very big status very big status very big status very big status very big status very big status very big status very big status very big status ",
+	}
+	for _, test := range tests {
+		fmt.Println(validateStatus(test))
+	}
+  ///other test
+  a := 10.0
 	b := 0.0
 	fmt.Println(divide(a, b))
 }
